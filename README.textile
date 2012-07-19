@@ -7,11 +7,11 @@ bc. class BigData < ActiveFedora::Datastream
 end
 
 bc. class DataContainer < ActiveFedora::Base
-  has_datastream :name=>'bigData', :type=> BigData
+  has_file_datastream :name=>'bigData', :type=> BigData
 end
 
 and then set the response_body in your controller:
 
 bc. self.response_body = DataContainer.find('demo:1').bigData.stream
 
-The iterator returned from #stream will write the bytes of a datastream dissemination back to the client in segments, without reading all of the content into memory first.  It will not assign the output of the datastream dissemination to the ActiveFedora::Datastream's content attribute. 
+The iterator returned from #stream will write the bytes of a datastream dissemination back to the client in segments, without reading all of the content into memory first.  It will not assign the output of the datastream dissemination to the ActiveFedora::Datastream's content attribute.

@@ -1,40 +1,29 @@
 require 'active-fedora'
-module ActiveFedora
-  module Datastreams
-    module Streamable
-      # the output of this method should be assigned to the response_body of a controller
-      # the bytes returned from the datastream dissemination will be written to the response
-      # piecemeal rather than being loaded into memory as a String
-      def stream(parms=Hash.new)
-        parms = {:dsid=>self.dsid, :pid=>self.pid}.merge parms
-        return ActiveFedora::Datastreams::Streamable::Streamer.new parms
+module ActiveFedora::Datastreams
+  module Streamable
+    VERSION = '0.1.0'
+    # the output of this method should be assigned to the response_body of a controller
+    # the bytes returned from the datastream dissemination will be written to the response
+    # piecemeal rather than being loaded into memory as a String
+    def stream(controller, parms=Hash.new)
+      parms = {:dsid=>self.dsid, :pid=>self.pid, :finished=>false}.merge parms
+      controller.headers['Last-Modified'] = self.lastModifiedDate || Time.now.ctime.to_s
+      if self.dsSize
+        controller.headers['Content-Length'] = self.dsSize.to_s
+      else
+        controller.headers['Transfer-Encoding'] = 'chunked'
       end
-      
-      class Streamer
-        def initialize(parms=Hash.new)
-          raise "ActiveFedora::Datastreams::Streamable::Streamer requires opts[:dsid]" unless parms[:dsid]
-          raise "ActiveFedora::Datastreams::Streamable::Streamer requires opts[:pid]" unless parms[:pid]
-          @rubydora_parms = parms
-          # Rails 3.0.x calls the iterator twice. This flag should have no effect in 3.1.x
-          @done = false
-        end
-
-        # Rails 3 expects to iterate over the streamed segments
-        # RestClient's block needs to close over the Rails block,
-        # so we create it here in the iterator
-        def each(&output_block)
-          return if @done
-          block_response =  Proc.new { |res|
-            res.read_body do |seg|
-              output_block.call(seg)
-            end
-          }
-          repo = ActiveFedora::Base.connection_for_pid(@rubydora_parms[:pid])
-          repo.datastream_dissemination @rubydora_parms.dup, &block_response
-          @done = true
+      #controller.response_body = ActiveFedora::Datastreams::Streamable::Streamer.new parms
+      controller.response_body = Enumerator.new do |blk|
+        repo = ActiveFedora::Base.connection_for_pid(parms[:pid])
+        repo.datastream_dissemination(parms) do |res|
+          res.read_body do |seg|
+            blk << seg
+          end
+          # this is a hack for https://github.com/archiloque/rest-client/issues/134
+          repo.client.options.delete :block_response 
         end
       end
     end
   end
 end
-require 'active_fedora_streamable/version'
