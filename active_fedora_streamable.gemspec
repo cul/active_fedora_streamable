@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "active_fedora_streamable"
+require "active_fedora_streamable/version"
 
 Gem::Specification.new do |s|
   s.name        = "active_fedora_streamable"
-  s.version     = ActiveFedora::Datastreams::Streamable::VERSION
+  s.version     = ActiveFedora::Streamable::Datastreams::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Benjamin Armintor"]
   s.email       = ["armintor@gmail.com"]
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency('active-fedora', '>=4.2.0')
   s.add_dependency("activesupport", '~>3.2.0')
-  s.add_dependency("rubydora", '~>0.5.9')
+  s.add_dependency("rubydora", '~>0.5.11')
   s.add_development_dependency("yard")
   s.add_development_dependency("RedCloth") # for RDoc formatting
   s.add_development_dependency("rake")

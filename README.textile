@@ -3,7 +3,7 @@ An ActiveFedora mixin that allows a datastream dissemination response to be stre
 Include the mixin in your ActiveFedora::Datastream subclass:
 
 bc. class BigData < ActiveFedora::Datastream
-  include ActiveFedora::Datastreams::Streamable
+  include ActiveFedora::Streamable::Datastreams
 end
 
 bc. class DataContainer < ActiveFedora::Base
