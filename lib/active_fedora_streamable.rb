@@ -1,7 +1,10 @@
 require 'active-fedora'
+require 'active_support'
 module ActiveFedora
   module Streamable
     module Datastreams
+      extend ActiveSupport::Autoload
+      autoload :Version
       # the output of this method should be assigned to the response_body of a controller
       # the bytes returned from the datastream dissemination will be written to the response
       # piecemeal rather than being loaded into memory as a String
@@ -23,7 +26,6 @@ module ActiveFedora
           end
         end
       end
-      require 'active_fedora_streamable/version'
     end
   end
 end
