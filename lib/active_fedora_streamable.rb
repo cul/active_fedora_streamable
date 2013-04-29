@@ -21,6 +21,7 @@ module ActiveFedora
           repo = ActiveFedora::Base.connection_for_pid(parms[:pid])
           repo.datastream_dissemination(parms) do |res|
             res.read_body do |seg|
+              puts "writing #{seg.length} bytes"
               blk << seg
             end
           end
